@@ -1,0 +1,240 @@
+
+#### Codeigniter registration  ######
+	
+	public function registrar(){
+	$this->load->library('form_validation');
+		$this->form_validation
+		->set_rules('usuario', 'Usuario', 'trim|required|xss_clean|alpha_dash|max_length[40]|min_length[5]|is_unique[usuarios.usuario]')
+		->set_rules('email', 'Email', 'trim|required|valid_email|xss_clean|valid_email|max_length[50]|is_unique[usuarios.email]')
+		->set_rules('password', 'Password', 'trim|min_length[5]|required|xss_clean|matches[password_conf]')
+		->set_rules('password_conf', 'Password Confirmacion', 'required|trim|xss_clean|');
+	$this->form_validation->set_message('required','El campo %s es requerido.');
+	
+		
+		
+		
+		
+		        if ($this->form_validation->run())
+		        {
+		            $this->usuario->crear_usuario(
+		                                    $this->input->post('usuario'),
+		                                    $this->input->post('password'),
+		                                    $this->input->post('email')
+		                                );
+		
+		            $this->session->set_flashdata('registration_message', 'Thanks for registering.  Log in now!');
+		            redirect();
+		        }
+		
+		        $data['content'] = 'registro';
+		        $this->load->view('front_layout', $data);
+	
+	}
+	
+	#### LOGIN ####
+	public function acceso(){
+	$this->load->library('form_validation');
+	$this->form_validation->set_rules('email', 'Email', 'required|max_length[40]')
+	                    ->set_rules('password', 'Password', 'required');
+	
+	        $data = array(
+	            'login_error' => FALSE,
+	        );
+	        
+		if ($this->form_validation->run())
+        {
+            $email = $this->input->post('email');
+            $password = $this->input->post('password');
+
+            if (FALSE !== ($user = $this->usuario->check_log_in($email, $password)))
+            {
+                redirect('/');
+            }
+
+            $data['login_error'] = TRUE;
+        }
+	        
+		$data['content'] = 'home';
+		$this->load->view('front_layout', $data);
+	
+	}
+	
+	
+	public function salir(){
+		$this->usuario->logout();
+		$data['content'] = 'acceso';
+		$this->load->view('front_layout', $data);
+	}
+### END CONTROLLER FUNCTIONS
+
+
+## MODEL ##
+
+
+		public function crear_usuario($usuario, $password, $email){ 
+				
+				$salt = $this->_create_salt();
+				$validacion = $this->_create_salt();
+				$user_ip = $this->get_client_ip();
+				$combinacion = sha1($password.''.$salt);
+				$data = array(
+				'usuario'=>$usuario, 
+				'password' => $combinacion, 
+				'email' => $email, 
+				'salt'=> $salt, 
+				'registro' => date("Y-m-d H:i:s"),
+				'validacion' => $validacion,
+				'user_ip' => $user_ip);
+				$this->db->insert('usuarios', $data);
+						
+		
+				}
+		
+		protected function _create_salt()
+		{
+		    $this->load->helper('string');
+		    return sha1(random_string('alnum', 32));
+		}
+		function get_client_ip() {
+		        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {   //check ip from share internet
+		            $ip = $_SERVER['HTTP_CLIENT_IP'];
+		        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {   //to check ip is pass from proxy
+		            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		        } else {
+		            $ip = $_SERVER['REMOTE_ADDR'];
+		        }
+		        return $ip;
+		    }
+		
+		
+		
+		public function crear_usuario($usuario, $password, $email){ 
+				
+				$salt = $this->_create_salt();
+				$validacion = $this->_create_salt();
+				$user_ip = $this->get_client_ip();
+				$combinacion = sha1($password.''.$salt);
+				$data = array(
+				'usuario'=>$usuario, 
+				'password' => $combinacion, 
+				'email' => $email, 
+				'salt'=> $salt, 
+				'registro' => date("Y-m-d H:i:s"),
+				'validacion' => $validacion,
+				'user_ip' => $user_ip);
+				$this->db->insert('usuarios', $data);
+						
+		
+				}
+		
+		protected function _create_salt()
+		{
+		    $this->load->helper('string');
+		    return sha1(random_string('alnum', 32));
+		}
+		function get_client_ip() {
+		        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {   //check ip from share internet
+		            $ip = $_SERVER['HTTP_CLIENT_IP'];
+		        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {   //to check ip is pass from proxy
+		            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		        } else {
+		            $ip = $_SERVER['REMOTE_ADDR'];
+		        }
+		        return $ip;
+		    }
+		
+		
+		public function crear_usuario($usuario, $password, $email){ 
+				
+				$salt = $this->_create_salt();
+				$validacion = $this->_create_salt();
+				$user_ip = $this->get_client_ip();
+				$combinacion = sha1($password.''.$salt);
+				$data = array(
+				'usuario'=>$usuario, 
+				'password' => $combinacion, 
+				'email' => $email, 
+				'salt'=> $salt, 
+				'registro' => date("Y-m-d H:i:s"),
+				'validacion' => $validacion,
+				'user_ip' => $user_ip);
+				$this->db->insert('usuarios', $data);
+						
+		
+				}
+		
+		protected function _create_salt()
+		{
+		    $this->load->helper('string');
+		    return sha1(random_string('alnum', 32));
+		}
+		function get_client_ip() {
+		        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {   //check ip from share internet
+		            $ip = $_SERVER['HTTP_CLIENT_IP'];
+		        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {   //to check ip is pass from proxy
+		            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		        } else {
+		            $ip = $_SERVER['REMOTE_ADDR'];
+		        }
+		        return $ip;
+		    }
+		
+		public function check_log_in($email, $password){
+		$qry = $this->db->select('id, usuario, email, password, salt')
+		                        ->where('email', $email)
+		                        ->get('usuarios');
+		
+		    // No results, we're done.
+		    if ($qry->num_rows() !== 1)
+		    {
+		        return FALSE;
+		    }
+		echo 'llego pass:'.$password.'<br />Salt guardado:'.$qry->row('salt');
+		
+		echo '<br />combinacion: '.sha1($password.$qry->row('salt'));
+		
+		echo '<br />Solo con pass:'.sha1($password);
+		echo '<br />password guardado: '.$qry->row('password');
+		    if (sha1($password.$qry->row('salt')) == $qry->row('password'))
+		    {
+		        $data = array(
+		            'id'       => $qry->row('id'),
+		            'usuario'      => $qry->row('usuario'),
+		            'email'         => $qry->row('email'),
+		            'salt'          => $qry->row('salt'),
+		        );
+		
+		        #$this->session->set_userdata($data);
+				$this->session->set_userdata('logged_in', $data);
+		        return $qry->row('id');
+		    }
+		
+		    return FALSE;
+		}
+		
+		//Cerrar session
+		public function logout(){
+			$this->session->unset_userdata('logged_in');
+				redirect('/', 'refresh');
+		}
+
+## VIEW ##
+
+	<?php  
+	
+	if($this->session->userdata('logged_in'))
+	{
+	$usuario = $this->session->userdata('logged_in');
+	#var_dump($usuario);
+			 
+	echo '<p class="bienvenida"><span>Bienvenido <strong>'.$usuario['usuario'].'</strong> &nbsp; </span> <a href="'.base_url('salir').'"  > Salir </a></p>';
+	}else{
+	
+	echo '<p><a href="'.base_url('registro').'"  >Crear cuenta </a></p>';
+	
+	
+	}
+	
+	?>
+
+
